@@ -1,6 +1,6 @@
 ---
 - name: install the most simple apache web server
-  hosts: mthost
+  hosts: myhost
   become: true
   vars:
     packages:
