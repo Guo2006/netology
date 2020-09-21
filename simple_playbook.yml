@@ -1,0 +1,48 @@
+---
+- name: install the most simple apache web server
+  hosts: mthost
+  become: true
+  vars:
+    packages:
+      - httpd
+      - firewalld
+  tasks:
+    - name:  Install latest httpd and firewalld
+      yum:
+        name: "{{packages}}"
+        state: latest
+
+    - name:  enable and running
+      service:
+        name: "{{packages}}"
+        enabled: true
+        state: started
+
+    - name: create html page
+      copy:
+        content: "Hello World!!\n"
+        dest: /var/www/html/index.html
+
+    - name: add firewalld permits
+      firewalld:
+        service: http
+        permanent: true
+        state: enable
+        immediate: true
+      notify: restart services
+
+  handlers:
+    - name: restart services
+      service: "{{packages}}"
+      state: restarted
+
+
+- name: test web server
+  hosts: myhost
+  become: false
+  tasks:
+
+    - name: check connection
+      uri:
+        url: http://myhost
+        satus code: 200
